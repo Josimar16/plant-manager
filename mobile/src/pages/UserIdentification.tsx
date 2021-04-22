@@ -11,11 +11,11 @@ import {
   TouchableWithoutFeedback,
   Keyboard
 } from 'react-native';
-import { Button } from '../Components/Button';
+import { Button } from '../components/Button';
 import colors from '../styles/colors';
 import fonts from '../styles/fonts';
 
-export function UserIdentification() {
+export const UserIdentification = () => {
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
   const [name, setName] = useState<string>();
