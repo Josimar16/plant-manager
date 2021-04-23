@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Text,
   StyleSheet,
@@ -13,6 +13,7 @@ import { SvgFromUri } from 'react-native-svg';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
 import { useRoute } from '@react-navigation/core';
 import DateTimePicker, { Event } from '@react-native-community/datetimepicker';
+import { format, isBefore } from 'date-fns';
 
 import waterdrop from '../assets/waterdrop.png';
 
@@ -20,26 +21,47 @@ import { Button } from '../components/Button';
 
 import colors from '../styles/colors';
 import fonts from '../styles/fonts';
+import { IPlantProps, savePlant, loadPlant } from '../libs/storage';
 
 interface IParams {
-  plant: {
-    id: string;
-    name: string;
-    about: string;
-    water_tips: string;
-    photo: string;
-    environments: [string];
-    frequency: {
-      times: number,
-      repeat_every: string
-    };
-  }
+  plant: IPlantProps
 }
 
 export const PlantSave = () => {
+  const [selectedDateTime, setSelectedDateTime] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(Platform.OS == 'ios');
+
   const route = useRoute();
 
   const { plant } = route.params as IParams;
+
+  function handleChangeTime(event: Event, dateTime: Date | undefined) {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(oldState => !oldState);
+    }
+    if (dateTime && isBefore(dateTime, new Date())) {
+      setSelectedDateTime(new Date());
+      return Alert.alert('Escolha uma hora no futuro! ⏰');
+    }
+    if (dateTime) {
+      setSelectedDateTime(dateTime);
+    }
+  }
+
+  function handleOpenDatetimePickerForAndroid() {
+    setShowDatePicker(oldState => !oldState);
+  }
+
+  async function handleSave() {
+    try {
+      await savePlant({
+        ...plant,
+        dateTimeNotification: selectedDateTime
+      });
+    } catch {
+      Alert.alert('Não foi possível salvar a planta. 😢');
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -71,10 +93,32 @@ export const PlantSave = () => {
         <Text style={styles.alertLabel}>
           Escolha o melhor horário para ser lembrado:
         </Text>
-
+        {
+          showDatePicker &&
+          (<DateTimePicker
+            value={selectedDateTime}
+            mode="time"
+            display="spinner"
+            onChange={handleChangeTime}
+          />
+          )
+        }
+        {
+          Platform.OS === 'android' && (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={handleOpenDatetimePickerForAndroid}
+              style={styles.dateTimePickerButton}
+            >
+              <Text style={styles.dateTimePickerText}>
+                {`Mudar ${format(selectedDateTime, 'HH:mm')}`}
+              </Text>
+            </TouchableOpacity>
+          )
+        }
         <Button
           title="Cadastrar planta"
-          onPress={() => { }}
+          onPress={() => handleSave}
         />
       </View>
     </View>
@@ -122,7 +166,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 20,
     position: 'relative',
-    bottom: 70
+    bottom: 60
   },
   tipImage: {
     width: 56,
@@ -142,5 +186,15 @@ const styles = StyleSheet.create({
     color: colors.heading,
     fontSize: 12,
     marginBottom: 5
+  },
+  dateTimePickerButton: {
+    width: '100%',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  dateTimePickerText: {
+    color: colors.heading,
+    fontSize: 24,
+    fontFamily: fonts.text
   }
 });
