@@ -4,11 +4,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { Welcome } from '../pages/Welcome';
 import { UserIdentification } from '../pages/UserIdentification';
 import { Confirmation } from '../pages/Confirmation';
-import { PlantSelect } from '../pages/PlantSelect';
 import { PlantSave } from '../pages/PlantSave';
+import { MyPlants } from '../pages/MyPlants';
+import { TabRoutes } from './tab.routes';
 
 import colors from '../styles/colors';
-import { MyPlants } from '../pages/MyPlants';
 
 const stackRoutes = createStackNavigator();
 
@@ -38,7 +38,7 @@ const StackRoutes: React.FC = () => (
 
     <stackRoutes.Screen
       name="PlantSelect"
-      component={PlantSelect}
+      component={TabRoutes}
     />
 
     <stackRoutes.Screen
@@ -48,7 +48,7 @@ const StackRoutes: React.FC = () => (
 
     <stackRoutes.Screen
       name="MyPlants"
-      component={MyPlants}
+      component={TabRoutes}
     />
   </stackRoutes.Navigator>
 );
