@@ -17,6 +17,7 @@ import { IPlantProps, loadPlant } from '../libs/storage';
 
 import colors from '../styles/colors';
 import fonts from '../styles/fonts';
+import { Load } from '../components/Load';
 
 export const MyPlants = () => {
   const [myPlants, setMyPlants] = useState<IPlantProps[]>([]);
@@ -41,6 +42,8 @@ export const MyPlants = () => {
     }
     loadStorageData();
   }, []);
+
+  if (loading) return <Load />;
 
   return (
     <View style={styles.container}>
