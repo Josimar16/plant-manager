@@ -6,6 +6,7 @@ import {
   FlatList,
   ActivityIndicator
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native'
 
 import api from '../services/api';
 
@@ -36,6 +37,8 @@ interface IPlantsProps {
 }
 
 export const PlantSelect = () => {
+  const navigation = useNavigation();
+
   const [environments, setEnvironments] = useState<IEnvironmentProps[]>([]);
   const [environmentSelected, setEnvironmentSelected] = useState('all');
 
@@ -75,6 +78,10 @@ export const PlantSelect = () => {
     }
     setLoading(false);
     setLoadingMore(false);
+  }
+
+  function handlePlantSelect(plant: IPlantsProps) {
+    navigation.navigate('PlantSave', { plant });
   }
 
   useEffect(() => {
@@ -138,6 +145,7 @@ export const PlantSelect = () => {
             <PlantCardPrimary
               key={item.id}
               data={item}
+              onPress={() => handlePlantSelect(item)}
             />
           )}
           numColumns={2}
